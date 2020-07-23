@@ -1,5 +1,7 @@
 import 'react-native-gesture-handler/jestSetup';
 
+jest.useFakeTimers();
+
 jest.mock('react-native-reanimated', () => {
     const Reanimated = require('react-native-reanimated/mock');
 
