@@ -12,12 +12,14 @@
   "dependencies": {
     "@react-native-community/masked-view": "^0.1.10",
     "@react-navigation/native": "^5.7.3",
+    "@react-navigation/stack": "^5.9.0",
     "react": "16.13.1",
     "react-native": "0.63.2",
     "react-native-elements": "^2.1.0",
     "react-native-gesture-handler": "^1.7.0",
     "react-native-modal": "^11.5.6",
     "react-native-modalize": "^2.0.5",
+    "react-native-portalize": "^1.0.4",
     "react-native-reanimated": "^1.10.1",
     "react-native-safe-area-context": "^3.1.1",
     "react-native-screens": "^2.10.1",
@@ -31,14 +33,15 @@
     "validate.js": "^0.13.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.4",
-    "@babel/runtime": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/runtime": "^7.9.2",
     "@react-native-community/eslint-config": "^1.1.0",
     "babel-jest": "^25.1.0",
     "babel-plugin-module-resolver": "^4.0.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "eslint": "^6.5.1",
     "jest": "^25.1.0",
+    "jest-transform-stub": "^2.0.0",
     "metro-react-native-babel-preset": "^0.59.0",
     "react-native-svg-transformer": "^0.14.3",
     "react-test-renderer": "16.13.1"
@@ -52,7 +55,8 @@
       "node_modules/(?!(jest-)?react-native|react-native-screen)"
     ],
     "moduleNameMapper": {
-      "\\.svg": "<rootDir>/__mock__/svgMock.js"
+      "\\.svg": "<rootDir>/__mock__/svgMock.js",
+      ".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub"
     }
   }
 }
