@@ -15,7 +15,7 @@ import DialogProvider from './dialog/DialogProvider';
 
 //================== LANGUAGE SETTING ==================//
 const STORAGE_KEY = 'LANG_ID';
-const LangContext = React.createContext();
+const AppContext = React.createContext();
 
 const AppContextProvider = ({children}) => {
     const [langID, setLangID] = useState('id');
@@ -40,15 +40,15 @@ const AppContextProvider = ({children}) => {
     StatusBar.setBarStyle('light-content');
 
     return (
-        <LangContext.Provider value={{langID, setLangID, dim, setDimension, realm, setRealm}}>
+        <AppContext.Provider value={{langID, setLangID, dim, setDimension, realm, setRealm}}>
             <DialogProvider>{langID ? children : null}</DialogProvider>
-        </LangContext.Provider>
+        </AppContext.Provider>
     );
 };
 
 function withLanguage(Component) {
     return React.forwardRef((props, ref) => {
-        const {langID, setLangID} = useContext(LangContext);
+        const {langID, setLangID} = useContext(AppContext);
 
         const getLang = (lang) => Lang[lang];
         const setLang = (lang) => {
@@ -69,7 +69,7 @@ function withLanguage(Component) {
 
 function withDimensions(Component) {
     return React.forwardRef((props, ref) => {
-        const {dim, setDimension} = useContext(LangContext);
+        const {dim, setDimension} = useContext(AppContext);
 
         return (
             <Component
@@ -208,7 +208,7 @@ function withSafeArea(Component) {
 
 function withRealm(Component) {
     return React.forwardRef((props, ref) => {
-        const {realm, setRealm} = useContext(LangContext);
+        const {realm, setRealm} = useContext(AppContext);
 
         return <Component {...props} realm={realm} />;
     });
@@ -223,6 +223,7 @@ export {
     withDimensions,
     withRealm,
     aspectRatio,
+    AppContext,
 };
 
 export default AppContextProvider;
