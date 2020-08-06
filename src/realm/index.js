@@ -7,7 +7,7 @@ class ContactLocal extends Realm.Object {}
 ContactLocal.schema = ContactLocalSchema;
 
 export default new Realm({
-    path: 'sasa.realm',
+    path: 'app.realm',
     schema: [Contact, ContactLocal],
     schemaVersion: 0,
     deleteRealmIfMigrationNeeded: true,
