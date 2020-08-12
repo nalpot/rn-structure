@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-import {Alert} from '../libs/dialog/DialogProvider';
+import {Alert} from '@app/libs/dialog/DialogProvider';
 //todo fix this
 const url = `your url`;
 const interval = 30000;
