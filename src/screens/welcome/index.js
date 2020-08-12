@@ -21,7 +21,7 @@ const mapStateToProps = (state, props) => {
 };
 
 const mapDispatchToProps = {
-    setLoading: (b) => (dispatch) => setLoadingSplash(b),
+    setLoading: (b) => (dispatch) => dispatch(setLoadingSplash(b)),
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SplashScreen);
