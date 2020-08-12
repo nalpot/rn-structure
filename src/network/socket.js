@@ -1,7 +1,7 @@
 import io from 'socket.io-client';
-import {BASE, PORT} from './EndPoints';
 import {Alert} from '../libs/dialog/DialogProvider';
-const url = `${BASE}:${PORT}`;
+//todo fix this
+const url = `your url`;
 const interval = 30000;
 export let socketApp;
 
