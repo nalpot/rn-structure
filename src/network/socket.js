@@ -1,61 +1,10 @@
-import io from 'socket.io-client';
+import {io} from 'socket.io-client';
+import Crypto from '@app/config/Crypto';
 import {Alert} from '@app/libs/dialog/DialogProvider';
-//todo fix this
-const url = `your url`;
 const interval = 30000;
-export let socketApp;
+const TAG = 'Socket =>';
 
-export function checkSocket() {
-    return new Promise((resolve, reject) => {
-        if (!socketApp || !socketApp.connected) {
-            socketApp = io.connect(url, {
-                timeout: 10000,
-                jsonp: false,
-                forceNew: true,
-                transports: ['polling', 'websocket'],
-                autoConnect: true,
-            });
-            socketApp.connect();
-            resolve();
-        } else {
-            resolve();
-        }
-    });
-}
-
-export async function emit(
-    socket,
-    event,
-    param,
-    withTimeout = true,
-    withcallback = true,
-) {
-    await checkSocket();
-
-    if (!socket) {
-        socket = socketApp;
-    }
-
-    console.log(event, param);
-    if (!withcallback) {
-        socket.emit(event, param);
-    } else {
-        const id = Math.random();
-        return new Promise((resolve, reject) => {
-            withTimeout && startTimeout(id, reject);
-            socket.emit(event, param, resolve);
-        })
-            .then((res) => {
-                withTimeout && stopTimeout(id);
-                return res;
-            })
-            .catch((err) => {
-                Alert.alert('', err.msg || err.message, [{text: 'OK'}]);
-                return err;
-            });
-    }
-}
-
+//todo fix me
 const timeout = new Map();
 
 function startTimeout(id, reject) {
@@ -68,6 +17,132 @@ function startTimeout(id, reject) {
 
 function stopTimeout(id) {
     const t = timeout.get(id);
-    t && clearTimeout(t);
+    clearTimeout(t);
     timeout.delete(id);
 }
+
+class Socket {
+    socketApp;
+    url = '';
+    opt;
+    onConnect;
+    onDisconnect;
+    onError;
+
+    setUrl(url) {
+        this.url = url;
+    }
+
+    constructor(onConnected, onDisconnect, onError) {
+        this.onConnect = onConnected;
+        this.onDisconnect = onDisconnect;
+        this.onError = onError;
+    }
+
+    setOptions(opt: {isLogin: false, ...obj}) {
+        if (opt.hasOwnProperty('isLogin') && opt.isLogin) {
+            this.opt = Crypto.enc(this.genQuery(true, opt));
+        } else {
+            this.opt = Crypto.enc(this.genQuery(false, opt));
+        }
+    }
+
+    genQuery(login, opt = {username: null}) {
+        const param = {mode: 'clientside', app: 'beli_aja', version: 3};
+        return {...param, ...opt};
+    }
+
+    get socket() {
+        return this.socketApp;
+    }
+
+    init(url: string, params) {
+        console.log('connecting =>', url);
+        // console.log('connecting =>', params);
+        this.socketApp = io.connect(url, {
+            query: `param=${params}`,
+        });
+    }
+
+    listener(
+        onConnect = () => null,
+        onDisconnect = () => null,
+        onError = () => null,
+    ) {
+        const sockets = this.socketApp;
+        if (sockets) {
+            sockets.off('connect_error');
+            sockets.off('connect');
+            sockets.off('disconnect');
+            sockets.on('connect', onConnect.bind(this, sockets));
+            sockets.on('disconnect', onDisconnect.bind(this, sockets));
+            sockets.on('connect_error', () => !onError.bind(this, sockets));
+        }
+    }
+
+    unListener() {
+        this.socketApp.off();
+    }
+
+    connect() {
+        if (this.socketApp && this.socketApp.connected) {
+            console.log('already connected ', this.url);
+            this.listener(this.onConnect, this.onDisconnect, this.onError);
+            return true;
+        }
+        this.init(this.url, this.opt);
+        this.listener(this.onConnect, this.onDisconnect, this.onError);
+    }
+
+    emit(event, params) {
+        let self = this;
+        const id = Math.random();
+        return new Promise((resolve, reject) => {
+            startTimeout(id, reject);
+            setTimeout(() => {
+                if (self.socketApp) {
+                    console.log('event', event, self.url);
+                    self.socketApp.emit(event, params, resolve);
+                } else {
+                    resolve();
+                }
+            });
+        })
+            .then(async (arg) => {
+                stopTimeout(id);
+                return await new Promise((resolve, reject) => {
+                    return resolve(arg);
+                });
+            })
+            .catch((err) => {
+                Alert.alert('', err.msg || err.message, [{text: 'OK'}]);
+                return err;
+            });
+    }
+
+    off(event) {
+        let self = this;
+        setTimeout(() => {
+            self.socketApp.off(event);
+        });
+    }
+
+    on(event, listener) {
+        let self = this;
+        setTimeout(() => {
+            self.socketApp.on(event, listener);
+        });
+    }
+
+    disconnect() {
+        console.log('disconnect socket');
+        let self = this;
+        if (self.socketApp) {
+            self.socketApp.disconnect();
+            self.socketApp.off();
+            self.socketApp = null;
+        }
+    }
+}
+
+export default Socket;

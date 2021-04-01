@@ -28,12 +28,19 @@ build/
 .gradle
 local.properties
 *.iml
+*.bzl
+android/app/src/main/assets/
+
+# Visual Studio Code
+#
+.vscode/
 
 # node.js
 #
 node_modules/
 npm-debug.log
 yarn-error.log
+*.lock
 
 # BUCK
 buck-out/
